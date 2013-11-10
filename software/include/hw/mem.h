@@ -1,9 +1,9 @@
 #ifndef __HW_MEM_H
 #define __HW_MEM_H
 
-#define FLASH_OFFSET_BITSTREAM	0x00000000 /* 1536k */
-#define FLASH_OFFSET_BIOS		0x00180000 /* 128k */
-#define FLASH_OFFSET_APP		0x001A0000 /* remaining space */
+#define FLASH_OFFSET_BITSTREAM	0x00000000 /* 384k */
+#define FLASH_OFFSET_BIOS		0x00060000 /* 128k */
+#define FLASH_OFFSET_APP		0x00080000 /* remaining space */
 
 #define SDRAM_BASE			0x40000000
 
