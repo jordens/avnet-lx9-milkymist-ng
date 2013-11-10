@@ -31,7 +31,7 @@ static void membw_service(void)
 
 static void memtest_service(void)
 {
-	static unsigned int test_buffer[64*1024*1024/4] __attribute__((aligned(16)));
+	static unsigned int test_buffer[32*1024*1024/4] __attribute__((aligned(16)));
 	static unsigned char reading;
 	static unsigned int err, total_err;
 #ifdef DEBUG
