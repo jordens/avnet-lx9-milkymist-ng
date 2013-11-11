@@ -4,7 +4,8 @@ from fractions import Fraction
 from migen.fhdl.std import *
 from mibuild.generic_platform import ConstraintError
 
-from misoclib import lasmicon, lx9crg, spiflash, s6ddrphy, minimac3, gpio
+from misoclib import (lasmicon, lx9crg, spiflash, s6ddrphy, minimac3,
+		gpio, tdcdtc)
 from misoclib.gensoc import SDRAMSoC
 
 class _LX9ClockPads:
@@ -93,5 +94,28 @@ TIMESPEC "TSclk100" = PERIOD "GRPclk100" 10 ns HIGH 50%;
 		for d in ["mxcrg", "minimac3"]:
 			platform.add_source_dir(os.path.join("verilog", d))
 
+class LX9TDCDTC(MiniSoC):
+	csr_map = {
+		"tdcdtc":				17,
+	}
+	csr_map.update(MiniSoC.csr_map)
+
+	interrupt_map = {
+		"tdcdtc":				5,
+	}
+	interrupt_map.update(MiniSoC.interrupt_map)
+
+	def __init__(self, platform, with_memtest=False):
+		MiniSoC.__init__(self, platform, with_memtest)
+		self.submodules.tdcdtc = tdcdtc.TdcDtcHostif(
+				platform.request("pmod_diff"), hires=True)
+		self.add_wb_slave(lambda a: a[25:29] == 7, self.tdcdtc.bus)
+		self.comb += [
+			self.tdcdtc.serdes_strb.eq(self.crg.tdcdtc_strb),
+			]
+
 def get_default_subtarget(platform):
-	return MiniSoC
+	if platform.name == "lx9":
+		return MiniSoC
+	elif platform.name == "lx9tdcdtc":
+		return LX9TDCDTC
