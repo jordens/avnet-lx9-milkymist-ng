@@ -454,7 +454,7 @@ static int test_user_abort(void)
 {
 	char c;
 
-	printf("Automatic boot in 2 seconds...\n");
+	printf("Automatic boot in 1 second...\n");
 	printf("Q/ESC: abort boot\n");
 	printf("F7:    boot from serial\n");
 #ifdef MINIMAC_BASE
@@ -462,7 +462,7 @@ static int test_user_abort(void)
 #endif
 	timer0_en_write(0);
 	timer0_reload_write(0);
-	timer0_load_write(identifier_frequency_read()*2);
+	timer0_load_write(identifier_frequency_read()*1);
 	timer0_en_write(1);
 	timer0_update_value_write(1);
 	while(timer0_value_read()) {
@@ -491,12 +491,12 @@ static int test_user_abort(void)
 static void boot_sequence(void)
 {
 	if(test_user_abort()) {
-#ifdef FLASH_BOOT_ADDRESS
-		flashboot();
-#endif
 		serialboot();
 #ifdef MINIMAC_BASE
 		netboot();
+#endif
+#ifdef FLASH_BOOT_ADDRESS
+		flashboot();
 #endif
 		printf("No boot medium found\n");
 	}
