@@ -40,7 +40,8 @@ libs:
 
 load: memtest.bin
 	$(MAKE) -C $(MSCDIR)/tools
-	$(MSCDIR)/tools/flterm --port /dev/ttyUSB0 --kernel memtest.bin
+	xc3sprog -c papilio -R
+	$(MSCDIR)/tools/flterm --port /dev/ttyUSB1 --kernel memtest.bin
 
 
 clean:
