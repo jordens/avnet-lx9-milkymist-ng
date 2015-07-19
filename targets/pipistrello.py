@@ -8,6 +8,8 @@ from misoclib.mem.sdram.phy import s6ddrphy
 from misoclib.mem.sdram.core.lasmicon import LASMIconSettings
 from misoclib.mem.flash import spiflash
 from misoclib.soc.sdram import SDRAMSoC
+from misoclib.com.uart.phy import jtag
+from misoclib.com.uart import UART
 
 
 class _CRG(Module):
@@ -103,7 +105,12 @@ class BaseSoC(SDRAMSoC):
         SDRAMSoC.__init__(self, platform, clk_freq,
                           cpu_reset_address=0x170000,  # 1.5 MB
                           sdram_controller_settings=sdram_controller_settings,
+                          with_uart=False,
                           **kwargs)
+
+        self.submodules.uart_phy = jtag.Phy(jtag.BscanSpartan6())
+        self.submodules.uart = UART(self.uart_phy, phy_cd="jtag")
+        platform.add_period_constraint(self.uart_phy.impl.clk, 12.)
 
         self.submodules.crg = _CRG(platform, clk_freq)
 
