@@ -105,12 +105,12 @@ class BaseSoC(SDRAMSoC):
         SDRAMSoC.__init__(self, platform, clk_freq,
                           cpu_reset_address=0x170000,  # 1.5 MB
                           sdram_controller_settings=sdram_controller_settings,
-                          with_uart=False,
+                          #with_uart=False,
                           **kwargs)
 
-        self.submodules.uart_phy = jtag.Phy(jtag.BscanSpartan6())
-        self.submodules.uart = UART(self.uart_phy, phy_cd="jtag")
-        platform.add_period_constraint(self.uart_phy.impl.clk, 12.)
+        #self.submodules.uart_phy = jtag.Phy(jtag.BscanSpartan6())
+        #self.submodules.uart = UART(self.uart_phy, phy_cd="jtag")
+        #platform.add_period_constraint(self.uart_phy.impl.clk, 12.)
 
         self.submodules.crg = _CRG(platform, clk_freq)
 
