@@ -19,17 +19,17 @@ class SPIClockGen(Module):
         bias = Signal()
         zero = Signal()
         self.comb += [
-            zero.eq(cnt == 0),
+            zero.eq(cnt == self.load[1:]),
             self.edge.eq(zero & ~bias),
         ]
         self.sync += [
             If(zero,
                 bias.eq(0),
             ).Else(
-                cnt.eq(cnt - 1),
+                cnt.eq(cnt + 1),
             ),
             If(self.edge,
-                cnt.eq(self.load[1:]),
+                cnt.eq(0),
                 bias.eq(self.load[0] & (self.clk ^ self.bias)),
                 self.clk.eq(~self.clk),
             )
@@ -150,7 +150,7 @@ class SPIMachine(Module):
         ]
         self.comb += [
             self.cg.ce.eq(self.start | self.cs | ~self.cg.edge),
-            If(self.bits.write | ~self.bits.read,
+            If(self.oe,
                 self.cg.load.eq(self.div_write),
             ).Else(
                 self.cg.load.eq(self.div_read),
