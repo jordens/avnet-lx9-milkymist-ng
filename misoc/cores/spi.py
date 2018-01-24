@@ -148,17 +148,23 @@ class SPIMachine(Module):
         )
 
         write0 = Signal()
+        read0 = Signal()
         self.sync += [
             If(self.cg.edge & self.reg.shift,
                 write0.eq(self.bits.write),
-            )
+                read0.eq(self.bits.read),
+            ),
+            If(self.cg.edge & fsm.before_entering("IDLE"),
+                write0.eq(0),
+                read0.eq(0),
+            ),
         ]
         self.comb += [
             self.cg.ce.eq(self.start | self.cs | ~self.cg.edge),
-            If(self.oe,
-                self.cg.load.eq(self.div_write),
-            ).Else(
+            If(read0 | self.bits.read,
                 self.cg.load.eq(self.div_read),
+            ).Else(
+                self.cg.load.eq(self.div_write),
             ),
             self.cg.bias.eq(self.clk_phase),
             fsm.ce.eq(self.cg.edge),
