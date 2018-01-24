@@ -10,27 +10,32 @@ from misoc.interconnect.csr import *
 
 class SPIClockGen(Module):
     def __init__(self, width):
+        # SPI clock cycle duration for the current cycle
         self.load = Signal(width)
-        self.bias = Signal()  # bias this clock phase to longer times
+        # The LSB of `load` is applied to the SPI clock phase
+        # with `clk == bias`
+        self.bias = Signal()
         self.edge = Signal()
         self.clk = Signal(reset=1)
 
         cnt = Signal.like(self.load)
+        cnt_done = Signal()
         bias = Signal()
-        zero = Signal()
+        bias_done = Signal()
         self.comb += [
-            zero.eq(cnt == self.load[1:]),
-            self.edge.eq(zero & ~bias),
+            cnt_done.eq(cnt == self.load[1:]),
+            bias.eq(self.load[0] & (self.clk == self.bias)),
+            self.edge.eq(cnt_done & (~bias | bias_done)),
         ]
         self.sync += [
-            If(zero,
-                bias.eq(0),
+            If(cnt_done,
+                bias_done.eq(1),
             ).Else(
                 cnt.eq(cnt + 1),
             ),
             If(self.edge,
                 cnt.eq(0),
-                bias.eq(self.load[0] & (self.clk ^ self.bias)),
+                bias_done.eq(0),
                 self.clk.eq(~self.clk),
             )
         ]
